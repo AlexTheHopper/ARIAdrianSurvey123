@@ -6,6 +6,7 @@ from openpyxl.utils import get_column_letter
 from openpyxl import load_workbook
 import process_survey123_field_data_classes as cls
 
+
 global sssoc_info
 global site_survey_info
 global site_section_used
@@ -13,6 +14,24 @@ site_survey_info = []
 sssoc_info = []  # site survey section observed collected
 site_section_used = []
 
+def read_in_excel_tab(wkbook_sheet):
+    sheet = wkbook_sheet
+    print('reading in {0}'.format(sheet.title))
+
+    sheet_list = []
+    i = 0
+
+    for row in sheet.iter_rows(min_row=2, max_row=sheet.max_row, min_col=2, max_col=sheet.max_column, values_only=True):
+        sheet_list.append(row)
+    
+
+    return sheet_list
+
+def read_in_excel_tab_header(wkbook_sheet):
+    sheet = wkbook_sheet
+    for row in sheet.iter_rows(min_row=1, max_row=1, min_col=2, max_col=sheet.max_column, values_only=True):
+        return row
+    
 
 gear_types = {
     "1E Large": "EF_LB",
@@ -98,44 +117,30 @@ def get_random_shot(rs_site_id, rs_species):
     else:
         return random.choice(shotlist)
 
-def read_in_excel_tab(wkbook_sheet):
-    sheet = wkbook_sheet
-    print('reading in {0}'.format(sheet.title))
+def adjust_species_count(current, output_list, PGID, section_num, species,svy_header, obs_header, sample_header, loc_header, shot_header):
 
-    sheet_list = []
-    i = 0
+    for completed in output_list:
+        #Check that site, section and species match:
+        if PGID == completed.surveys[svy_header.index('GlobalID')]:
+            if section_num == completed.shots[shot_header.index('section_number')] or section_num == completed.samples[sample_header.index('section_number_samp')]:
+                if species == completed.observations[obs_header.index('species_obs')]:
+                    #Adjust accordingly
+                    if completed.observations[obs_header.index('section_collected')] is None:
+                        collected_temp = 1
+                    else:
+                        collected_temp = completed.observations[obs_header.index('section_collected')]
 
-    for row in sheet.iter_rows(min_row=1, max_row=sheet.max_row, min_col=1, max_col=sheet.max_column, values_only=True):
-        # #    print(row[0])
-        if i > 0:
-            sheet_list.append(row)
-        i = 1
 
-    return sheet_list
-
-def adjust_species_shot(ass_site_id, ass_species, ass_section_number, ass_collected):
-
-    found_data = False
-    for ass_i in sssoc_info:
-
-        # #        count = 0
-        if ass_site_id == ass_i[0] and ass_section_number == ass_i[1] and ass_species == ass_i[2]:
-            # #                print('{0},{1},{2},{3}'.format(i[0], i[1], i[2], i[5]))
-            found_data = True
-            if ass_collected is None:
-                ass_collected = 1
-
-            if ass_collected > 1:
-                ass_i[5] = ass_i[5] - ass_collected
-            else:
-                ass_i[5] = ass_i[5] - 1
-            return ass_i[5]
-    # #        count = count + 1
-
-    if not found_data:
-        sssoc_info.append(cls.SiteObs(ass_site_id, ass_section_number, ass_species, 0, 0, ass_collected, 'IN SAMPLE INFO', ''))
-
-    return -1
+                    if collected_temp > 1:
+                        collected_temp -= (1 if current[sample_header.index('section_number_samp')] is None else current[sample_header.index('section_number_samp')])
+            
+                    else:
+                        collected_temp = max(collected_temp, 0)
+                        
+                    completed.observations[obs_header.index('section_collected')] = collected_temp
+                    
+                    return
+    return
 
 def write_row(write_sheet, row_num: int, starting_column: str or int, write_values: list):
     if isinstance(starting_column, str):
@@ -220,6 +225,7 @@ def extra_record_output_no_fish_shot(ws, ero_site_id, ero_section_number, ero_ro
     ero_row_count = write_extra_data(ws, sub_sssoc_info, ero_row_count, 'no_shot_fish')
 
     return ero_row_count
+
 def write_extra_data(ws_out, wed_sub_sssoc_info, r_count, extraDataType):
 
     if len(wed_sub_sssoc_info) > 0:
