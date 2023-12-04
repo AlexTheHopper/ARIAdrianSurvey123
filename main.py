@@ -191,12 +191,19 @@ for svy in survey_list:
                             if survey_list_current[survey_list_header.index('section_condition')] == 'FISHABLE':
 
                                 #Build object for output
+                                #Find ID Indices:
+                                ID_Indices = [survey_list_header.index('GlobalID'),
+                                         loc_list_header.index('GlobalID'),
+                                         shot_list_header.index('GlobalID'),
+                                         obs_list_header.index('GlobalID'),
+                                         sample_list_header.index('GlobalID'),]
                                 raw_data.append(cls.resultObject(survey_list_current, 
                                                         loc_list_current, 
                                                         shot_list_current, 
                                                         obs_list_current, 
                                                         sample_list_current,
-                                                        creator))
+                                                        creator,
+                                                        ID_Indices))
 
                             #If section_collected is None, set to 0
                             if obs_list_current[obs_list_header.index('section_collected')] is None:
@@ -253,12 +260,19 @@ for svy in survey_list:
                                 obs_list_current[obs_list_header.index('section_collected')] = 0
 
                             #Build object for output
+                            #Find ID Indices:
+                            ID_Indices = [survey_list_header.index('GlobalID'),
+                                         loc_list_header.index('GlobalID'),
+                                         shot_list_header.index('GlobalID'),
+                                         obs_list_header.index('GlobalID'),
+                                         sample_list_header.index('GlobalID'),]
                             raw_data.append(cls.resultObject(survey_list_current, 
                                                         loc_list_current, 
                                                         shot_list_current, 
                                                         obs_list_current, 
                                                         sample_list_current,
-                                                        creator))
+                                                        creator,
+                                                        ID_Indices))
 
                         
             #If no shots exist, add 1 shot if fishable or samples present and add site information.
@@ -276,12 +290,19 @@ for svy in survey_list:
                         sample_list_current[sample_list_header.index('species_samp')] = sample_list_current[sample_list_header.index('species_samp_custom')]
 
                     # Build object for output
+                    #Find ID Indices:
+                    ID_Indices = [survey_list_header.index('GlobalID'),
+                                         loc_list_header.index('GlobalID'),
+                                         shot_list_header.index('GlobalID'),
+                                         obs_list_header.index('GlobalID'),
+                                         sample_list_header.index('GlobalID'),]
                     raw_data.append(cls.resultObject(survey_list_current, 
                                                     loc_list_current, 
                                                     shot_list_current, 
                                                     obs_list_current, 
                                                     sample_list_current,
-                                                    creator))           
+                                                    creator,
+                                                    ID_Indices))           
 #Create checklist for sample data, at least one value must be NOT 0 or None or will skip.
 sample_checklist = ['section_number_samp', 
                     'fork_length',
@@ -341,13 +362,19 @@ for smp in sample_list:
                     if obs_list_current[obs_list_header.index('observed')] is None:
                         obs_list_current[obs_list_header.index('observed')] = 0
                     
-                    
+                    #Find ID Indices:
+                    ID_Indices = [survey_list_header.index('GlobalID'),
+                                         loc_list_header.index('GlobalID'),
+                                         shot_list_header.index('GlobalID'),
+                                         obs_list_header.index('GlobalID'),
+                                         sample_list_header.index('GlobalID'),]
                     raw_data.append(cls.resultObject(raw_data[i].surveys, 
                                                 raw_data[i].locations, 
                                                 raw_data[i].shots, 
                                                 obs_list_current, 
                                                 sample_list_current,
-                                                creator))  
+                                                creator,
+                                                ID_Indices))  
                     break
 
 #Correctly format and order entries as list at top of code.

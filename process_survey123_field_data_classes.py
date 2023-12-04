@@ -1,6 +1,6 @@
 #Object for raw data rows:
 class resultObject:
-    def __init__(self, surveys, locations, shots, observations, samples, creator):
+    def __init__(self, surveys, locations, shots, observations, samples, creator, ID_Indices):
         self.surveys = surveys
         self.locations = locations
         self.shots = shots
@@ -8,11 +8,11 @@ class resultObject:
         self.samples = samples
 
         #Saves GlobalID values
-        self.survey_GlobalID = surveys[0]
-        self.site_GlobalID = locations[0]
-        self.shot_GlobalID = shots[0]
-        self.obs_GlobalID = observations[0]
-        self.sample_GlobalID = samples[0]
+        self.survey_GlobalID = self.surveys[ID_Indices[0]]
+        self.site_GlobalID = self.locations[ID_Indices[1]]
+        self.shot_GlobalID = self.shots[ID_Indices[2]]
+        self.obs_GlobalID = self.observations[ID_Indices[3]]
+        self.sample_GlobalID = self.samples[ID_Indices[4]]
 
         #Save creator from survey list
         self.creator = creator
@@ -48,17 +48,15 @@ class resultObject:
 
         #Ensure template and data have same length
         if len(template) < len(list):
-            print('template,list',len(template),len(list))
             diff = (len(list) - len(template))
             template += ([-1] * diff)
-            print('template,list',len(template),len(list))
+            print("Fixing Template Length - Ensure Match With Data Length")
+
         elif len(template) > len(list):
-            print('template,list',len(template),len(list))
             diff = (len(template) - len(list))
             del template[-diff:]
-            print('template,list',len(template),len(list))
-            
-        
+            print("Fixing Template Length - Ensure Match With Data Length")
+
 
         while index < (len(list)):
             extra = 0
