@@ -1,3 +1,4 @@
+#Object for raw data rows:
 class resultObject:
     def __init__(self, surveys, locations, shots, observations, samples, creator):
         self.surveys = surveys
@@ -20,6 +21,7 @@ class resultObject:
         self.collation = []
 
     def collate(self, globalHeader):
+        #Collates all data into one single list for output.
         self.collation += self.surveys
         self.collation += self.locations
         self.collation += self.shots
@@ -38,15 +40,24 @@ class resultObject:
         self.collation[globalHeader.index('species_obs')] = species
         self.collation.pop(globalHeader.index('species_samp'))
 
-
-
     def order(self, list, template, header, allocation):
+        #Orders data according to templates at top of main.
         result = [None] * len(list)
         header_result = [None] * len(list)
         index = 0
 
+        #Ensure template and data have same length
         if len(template) < len(list):
-            template += ([-1] * (len(list) - len(template)))
+            print('template,list',len(template),len(list))
+            diff = (len(list) - len(template))
+            template += ([-1] * diff)
+            print('template,list',len(template),len(list))
+        elif len(template) > len(list):
+            print('template,list',len(template),len(list))
+            diff = (len(template) - len(list))
+            del template[-diff:]
+            print('template,list',len(template),len(list))
+            
         
 
         while index < (len(list)):
@@ -54,9 +65,7 @@ class resultObject:
             
             #Joins two cells (eg personnel 1&2)
             if template[index] == 'j':
-        
                 try:
-                
                     instruction = str(list[index]) + ', ' + str(list[index + 1])
                     result[template[index+1]] = instruction
 
@@ -86,7 +95,7 @@ class resultObject:
             index += 1
             index += extra
 
-        
+        #Send reordered correct list
         if allocation == 'survey':
             self.surveys = result
         elif allocation == 'location':

@@ -32,7 +32,6 @@ def read_in_excel_tab_header(wkbook_sheet):
     for row in sheet.iter_rows(min_row=1, max_row=1, min_col=2, max_col=sheet.max_column, values_only=True):
         return row
     
-
 gear_types = {
     "1E Large": "EF_LB",
     "2E Large": "EF_LB",
@@ -55,7 +54,6 @@ gear_types = {
     "Unknown": "Unknown",
     "EXTRA_SHOT_IN_SAMPLES":"EXTRA_SHOT_IN_SAMPLES"
 }
-
 
 def get_random_shot(rs_site_id, rs_species):
 
@@ -117,9 +115,9 @@ def get_random_shot(rs_site_id, rs_species):
     else:
         return random.choice(shotlist)
 
-def adjust_species_count(current, output_list, PGID, section_num, species,svy_header, obs_header, sample_header, loc_header, shot_header):
+def adjust_species_count(current, raw_data, PGID, section_num, species,svy_header, obs_header, sample_header, loc_header, shot_header, tally_results, tally_header):
 
-    for completed in output_list:
+    for completed in raw_data:
         #Check that site, section and species match:
         if PGID == completed.surveys[svy_header.index('GlobalID')]:
             if section_num == completed.shots[shot_header.index('section_number')] or section_num == completed.samples[sample_header.index('section_number_samp')]:
@@ -136,10 +134,26 @@ def adjust_species_count(current, output_list, PGID, section_num, species,svy_he
             
                     else:
                         collected_temp = max(collected_temp, 0)
+                        # collected_temp = collected_temp - 1
                         
                     completed.observations[obs_header.index('section_collected')] = collected_temp
                     
+                    #Adjust Collected_Tally accordingly:
+                    #Find tally data with the same PGID, section_num and species:
+                    for tally in tally_results:
+                       
+                        if tally[tally_header.index('Site_ID')] == PGID:
+                            
+                            if tally[tally_header.index('Section_Number')] == section_num:
+                                if tally[tally_header.index('Species')] == species:
+                                    
+                                    #Alter collected_tally:
+                                    tally[tally_header.index('Collected_Tally')] = collected_temp
+
+
                     return
+                
+
     return
 
 def write_row(write_sheet, row_num: int, starting_column: str or int, write_values: list):
@@ -324,5 +338,3 @@ def write_excel_row(wsheet, rowcount, data_row, shot_num, wer_species, wer_fl, w
     wer_xl_row = list((data_row['k_project_name'], data_row['k_site_code'], data_row['k_x_start'], data_row['k_y_start'], data_row['k_x_finish'], data_row['k_y_finish'], data_row['k_survey_date'], wer_gear_type, personnel1, personnel2, data_row['k_depth_secchi'], data_row['k_depth_max'], data_row['k_depth_avg'], section_condition_xl, data_row['k_time_start'], data_row['k_time_end'], wer_survey_notes, shot_num, data_row['k_electro_seconds'], data_row['k_soak_minutes_per_unit'], data_row.section_time_start, data_row.section_time_end, data_row.volts, data_row.amps, data_row.pulses_per_second, data_row.percent_duty_cycle, wer_species, wer_fl, wer_tl, wer_w, wer_coll, wer_obs, wer_recapture, wer_pit, wer_external_tag_no, wer_genetics_label, wer_otoliths_label, wer_fauna_notes, data_row['k_water_qual_depth'], data_row['k_ec_25c'], data_row['k_water_temp'], data_row['k_do_mgl'], data_row['k_do_perc'], data_row['k_ph'], data_row['k_turbidity_ntu'], data_row['k_chlorophyll'], data_row['k_site_id'], data_row['k_shot_id'], wer_obst_id, wer_sample_id, data_row['k_data_x'], data_row['k_data_y']))
 
     write_row(wsheet, rowcount, 1, wer_xl_row)
-
-
