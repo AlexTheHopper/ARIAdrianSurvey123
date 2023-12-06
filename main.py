@@ -55,16 +55,15 @@ tally_sorters = ['Site_ID', 'Section_Number', 'Species']
 #==========================================================================================================================================#
 
 
-# import copy
-# import csv
-import io
+
+# import io
 import os
 from datetime import datetime
 import openpyxl
 from openpyxl import load_workbook
 import process_survey123_field_data_classes as cls
 import process_survey123_field_data_functions as func
-# import local_vars as localvars
+import local_vars as localvars
 from tkinter import *
 import tkinter.messagebox
 from tkinter.filedialog import askopenfilename #as fd
@@ -74,11 +73,8 @@ root = Tk()
 root.withdraw()
 root.update()
 
-dir_path = os.path.dirname(os.path.realpath(__file__))
-os.chdir(dir_path)
-
-# io_path = localvars.io_path
-filename = askopenfilename(initialdir=dir_path, title="Open Survey123 XLSX File")
+io_path = localvars.io_path
+filename = askopenfilename(initialdir=io_path, title="Open Survey123 XLSX File")
 in_xlfile = os.path.basename(filename)
 io_path = filename.replace(in_xlfile, '')
 
